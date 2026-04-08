@@ -1,26 +1,208 @@
-// Base URL
+# @Base_Url = http://localhost:3000
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### AUTHENTICATION
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### Signup (Public)
+
+# POST {{Base_Url}}/auth/signup
+# Content-Type: application/json
+
+# {
+# "name": "Jitendra Sahoo",
+# "email": "[Test11@gmail.com](mailto:Test11@gmail.com)",
+# "password": "test@1234"
+# }
+
+# ### Login (Public)
+
+# # @name login
+
+# POST {{Base_Url}}/auth/login
+# Content-Type: application/json
+
+# {
+# "email": "Test11@gmail.com",
+# "password": "test@1234"
+# }
+
+# ### ── Extract Tokens Automatically ─────────────────────────────
+
+# @accessToken = {{login.response.body.accessToken}}
+# @refreshToken = {{login.response.body.refreshToken}}
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### USER PROFILE
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### Get Profile (Protected)
+
+# GET {{Base_Url}}/auth/profile
+# Authorization: Bearer {{accessToken}}
+
+# ### Refresh Tokens
+
+# # @name refresh
+
+# POST {{Base_Url}}/auth/refresh
+# Content-Type: application/json
+
+# {
+# "refreshToken": "{{refreshToken}}"
+# }
+
+# ### Update tokens after refresh
+
+# @accessToken = {{refresh.response.body.accessToken}}
+# @refreshToken = {{refresh.response.body.refreshToken}}
+
+# ### Logout
+
+# POST {{Base_Url}}/auth/logout
+# Authorization: Bearer {{accessToken}}
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### AUTHORIZATION
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### Get My User (Protected)
+
+# GET {{Base_Url}}/user/me
+# Authorization: Bearer {{accessToken}}
+
+# ### Get All Users (ADMIN only)
+
+# GET {{Base_Url}}/user/all
+# Authorization: Bearer {{accessToken}}
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### ERROR TEST CASES
+
+# ### ─────────────────────────────────────────────────────────────
+
+# ### No Token → 401
+
+# GET {{Base_Url}}/auth/profile
+
+# ### Invalid Token → 401
+
+# GET {{Base_Url}}/auth/profile
+# Authorization: Bearer invalid.token.here
+
+
 @Base_Url = http://localhost:3000
 
-### Get Request (Health Check)
-GET {{Base_Url}}
+### ─────────────────────────────────────────────────────────────
+### AUTHENTICATION
+### ─────────────────────────────────────────────────────────────
 
-### Post Request
-POST {{Base_Url}}/auth/signup 
+### Signup (Public)
+
+POST {{Base_Url}}/auth/signup
 Content-Type: application/json
 
-//Body payload
 {
-  "name": "Jitendraa Sahoo",
-  "email": "Test10@gmail.com",
+  "name": "Jitendra Sahoo",
+  "email": "Test11@gmail.com",
   "password": "test@1234"
 }
 
-### Login Request
-POST {{Base_Url}}/auth/login 
+###
+
+### Login (Public)
+
+# @name login
+
+POST {{Base_Url}}/auth/login
 Content-Type: application/json
 
-//Body payload
 {
-  "email": "Test10@gmail.com",
+  "email": "Test11@gmail.com",
   "password": "test@1234"
 }
+
+###
+
+### ── Extract Tokens Automatically ─────────────────────────────
+
+@accessToken = {{login.response.body.accessToken}}
+@refreshToken = {{login.response.body.refreshToken}}
+
+### ─────────────────────────────────────────────────────────────
+### USER PROFILE
+### ─────────────────────────────────────────────────────────────
+
+### Get Profile (Protected)
+
+GET {{Base_Url}}/auth/profile
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Refresh Tokens
+
+# @name refresh
+
+POST {{Base_Url}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+### Update tokens after refresh
+
+@accessToken = {{refresh.response.body.accessToken}}
+@refreshToken = {{refresh.response.body.refreshToken}}
+
+### Logout
+
+POST {{Base_Url}}/auth/logout
+Authorization: Bearer {{accessToken}}
+
+###
+
+### ─────────────────────────────────────────────────────────────
+### AUTHORIZATION
+### ─────────────────────────────────────────────────────────────
+
+### Get My User (Protected)
+
+GET {{Base_Url}}/user/me
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get All Users (ADMIN only)
+
+GET {{Base_Url}}/user/all
+Authorization: Bearer {{accessToken}}
+
+###
+
+### ─────────────────────────────────────────────────────────────
+### ERROR TEST CASES
+### ─────────────────────────────────────────────────────────────
+
+### No Token → 401
+
+GET {{Base_Url}}/auth/profile
+
+###
+
+### Invalid Token → 401
+
+GET {{Base_Url}}/auth/profile
+Authorization: Bearer invalid.token.here
+
+###

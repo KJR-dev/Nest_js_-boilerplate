@@ -1,15 +1,18 @@
 import './instrument';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { Logger } from 'nestjs-pino';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
+import { Logger } from 'nestjs-pino';
+import { AppModule } from './app.module';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
 
+  app.use(cookieParser());
   app.useLogger(app.get(Logger));
 
   app.useGlobalPipes(
@@ -20,12 +23,16 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors();
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
   app.enableShutdownHooks();
 
   const config = new DocumentBuilder()
     .setTitle('Imperialpedia API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

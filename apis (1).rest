@@ -1,0 +1,114 @@
+@Base_Url = http://localhost:3000
+
+### ─────────────────────────────────────────────────────────────
+### AUTHENTICATION
+### ─────────────────────────────────────────────────────────────
+
+### Signup (Public)
+
+POST {{Base_Url}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Jitendra Sahoo",
+  "email": "Test11@gmail.com",
+  "password": "test@1234"
+}
+
+###
+
+### Login (Public)
+# @name login
+
+POST {{Base_Url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "Test11@gmail.com",
+  "password": "test@1234"
+}
+
+###
+
+### ─────────────────────────────────────────────────────────────
+### USER PROFILE
+### ─────────────────────────────────────────────────────────────
+
+### Get Profile (Protected)
+
+GET {{Base_Url}}/auth/profile
+Authorization: Bearer {{login.response.body.accessToken}}
+
+###
+
+### Refresh Tokens
+# @name refresh
+
+POST {{Base_Url}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{login.response.body.refreshToken}}"
+}
+
+###
+
+### Logout
+
+POST {{Base_Url}}/auth/logout
+Authorization: Bearer {{login.response.body.accessToken}}
+
+###
+
+### ─────────────────────────────────────────────────────────────
+### AUTHORIZATION
+### ─────────────────────────────────────────────────────────────
+
+### Get My User (Protected)
+
+GET {{Base_Url}}/user/me
+Authorization: Bearer {{login.response.body.accessToken}}
+
+###
+
+### Get All Users (ADMIN only)
+
+GET {{Base_Url}}/user/all
+Authorization: Bearer {{login.response.body.accessToken}}
+
+###
+
+### ─────────────────────────────────────────────────────────────
+### After Refresh - use these instead of above
+### ─────────────────────────────────────────────────────────────
+
+### Get Profile (After Refresh)
+
+GET {{Base_Url}}/auth/profile
+Authorization: Bearer {{refresh.response.body.accessToken}}
+
+###
+
+### Get My User (After Refresh)
+
+GET {{Base_Url}}/user/me
+Authorization: Bearer {{refresh.response.body.accessToken}}
+
+###
+
+### ─────────────────────────────────────────────────────────────
+### ERROR TEST CASES
+### ─────────────────────────────────────────────────────────────
+
+### No Token → 401
+
+GET {{Base_Url}}/auth/profile
+
+###
+
+### Invalid Token → 401
+
+GET {{Base_Url}}/auth/profile
+Authorization: Bearer invalid.token.here
+
+###
