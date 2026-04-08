@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { RegisterUserDto } from 'src/auth/dto/RegisterUser.dto';
 import { PrismaService } from 'src/database/prisma/prisma.service';
+import { UpdateUserDto } from './dto/UpdateUser.dto';
 
 @Injectable()
 export class UserService {
@@ -45,5 +46,19 @@ export class UserService {
       where: { id: userId },
       data: { refreshToken: null },
     });
+  }
+
+  async updateUser(userId: number, userData: UpdateUserDto) {
+    const updateData = await this.prismaService.user.update({
+      where: { id: userId },
+      data: userData,
+    });
+    const { password, refreshToken, ...safeUser } = updateData;
+
+    return safeUser;
+  }
+
+  async deleteUser(userId: number) {
+    return this.prismaService.user.delete({ where: { id: userId } });
   }
 }

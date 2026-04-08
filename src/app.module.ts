@@ -12,7 +12,6 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { LoggerModule } from './common/logger/logger.module';
 import { PrismaModule } from './database/prisma/prisma.module';
 import { UserModule } from './user/user.module';
-import { TokenService } from './token/token.service';
 
 @Module({
   imports: [
@@ -55,7 +54,6 @@ import { TokenService } from './token/token.service';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    TokenService,
   ],
 })
 export class AppModule {}
