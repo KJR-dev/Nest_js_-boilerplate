@@ -10,6 +10,7 @@ import { UserService } from 'src/user/user.service';
 import { LoginUserDto } from './dto/LginUser.dto';
 import { RegisterUserDto } from './dto/RegisterUser.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { TokenService } from './token/token.service';
 
 
 @Injectable()
@@ -17,6 +18,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
   ) {}
 
   // ── Register ────────────────────────────────────────────────────────────────
@@ -39,7 +41,7 @@ export class AuthService {
     });
 
     // Issue token pair on registration
-    const tokens = await this.generateTokens({
+    const tokens = await this.tokenService.generateTokens({
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
@@ -66,7 +68,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.generateTokens({
+    const tokens = await this.tokenService.generateTokens({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -100,7 +102,7 @@ export class AuthService {
     }
 
     // 3. Rotate tokens
-    const tokens = await this.generateTokens({
+    const tokens = await this.tokenService.generateTokens({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -129,11 +131,11 @@ export class AuthService {
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
-  private async generateTokens(payload: JwtPayload) {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, { expiresIn: '15m' }),
-      this.jwtService.signAsync(payload, { expiresIn: '7d' }),
-    ]);
-    return { accessToken, refreshToken };
-  }
+  // private async generateTokens(payload: JwtPayload) {
+  //   const [accessToken, refreshToken] = await Promise.all([
+  //     this.jwtService.signAsync(payload, { expiresIn: '15m' }),
+  //     this.jwtService.signAsync(payload, { expiresIn: '7d' }),
+  //   ]);
+  //   return { accessToken, refreshToken };
+  // }
 }

@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
+import { setAuthCookies } from 'src/common/util/cookie.util';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
@@ -29,22 +30,13 @@ export class AuthController {
     @Body() registerUserDTO: RegisterUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const data = await this.authService.signup(registerUserDTO);
-    res.cookie('accessToken', data.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    const newUser = await this.authService.signup(registerUserDTO);
 
-    res.cookie('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    setAuthCookies(res, newUser);
 
     return {
       message: 'Signup successful',
-      userId: data.id,
+      userId: newUser.id,
     };
   }
 
@@ -56,21 +48,12 @@ export class AuthController {
     @Body() loginUserData: LoginUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const data = await this.authService.login(loginUserData);
-    res.cookie('accessToken', data.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    const user = await this.authService.login(loginUserData);
 
-    res.cookie('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    setAuthCookies(res, user);
 
     return {
-      message: 'Login successful'
+      message: 'Login successful',
     };
   }
 
@@ -78,22 +61,16 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access & refresh tokens' })
-  async refresh(@Req() req: Request,@Res({passthrough:true}) res:Response) {
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const data = await this.authService.refreshTokens(req.cookies.refreshToken);
-    res.cookie('accessToken', data.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
 
-    res.cookie('refreshToken', data.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    setAuthCookies(res, data);
 
     return {
-      message: 'Login successful'
+      message: 'Token refresh successful',
     };
   }
 
@@ -101,7 +78,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout – invalidates refresh token' })
-  async logout(@CurrentUser() user: JwtPayload, @Res({passthrough:true}) res:Response) {
+  async logout(
+    @CurrentUser() user: JwtPayload,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     await this.authService.logout(user.id);
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
